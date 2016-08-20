@@ -9,36 +9,29 @@ int debug = 0;
 
 int sumaMax(vector<int> v){
 	
-	int max = 0;
+	int maximo = 0;
 	int sumaActual = 0;
-	int inicio = 0;
-	int actual = 0;
 
 	for (int i = 0; i < v.size(); ++i){
 
-		if(debug){cout << "Iteracion: " << i << endl;}
-		int aux = sumaActual;
-		if(debug){cout << "Suma Actual: " << sumaActual << endl;}
-		sumaActual = sumaActual + v[actual];
-		if(debug){cout << "Suma Actual+: " << sumaActual << endl;}		
+		//if(debug){cout << "Iteracion: " << i << endl;}
+		//if(debug){cout << "Suma Actual: " << sumaActual << endl;}
+		sumaActual = sumaActual + v[i];
+		//if(debug){cout << "Suma Actual+: " << sumaActual << endl;}		
 
 		if(sumaActual<0){			
-			inicio = actual;
 			sumaActual = 0;
-			actual++;							
 		}else{
-			if(sumaActual>max){max = sumaActual;}
-			if(debug){cout << "Max: " << max << endl;}
-			actual++;
+			maximo = max(sumaActual,maximo);
+			//if(debug){cout << "Max: " << maximo << endl;}
 		}	
 	}
 
-	if(debug){cout << "Inicio: " << inicio << endl;}
-	if(debug){cout << "Actual: " << actual << endl;}
-	if(debug){cout << "sumaActual: " << sumaActual << endl;}
+	//if(debug){cout << "Actual: " << i << endl;}
+	//if(debug){cout << "sumaActual: " << sumaActual << endl;}
 
 
-	return max;
+	return maximo;
 }
 
 void testManuales(){
