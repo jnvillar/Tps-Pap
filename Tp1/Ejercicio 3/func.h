@@ -8,7 +8,16 @@ using namespace std;
 int debug = 0;
 
 
-int sumaMax(vector<int> v){
+int sumaMax(){
+	vector<int> v;
+	int cant;
+	cin >> cant;
+	for (int i = 0; i<cant; i++){
+		int val;
+		cin >> val;
+		v.push_back(val);
+	}
+
 	int max = 0;
 	int sumaActual = 0;
 	int inicio = 0;
