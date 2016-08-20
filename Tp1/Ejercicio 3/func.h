@@ -7,7 +7,6 @@ using namespace std;
 
 int debug = 0;
 
-
 int sumaMax(vector<int> v){
 	
 	int max = 0;
@@ -42,9 +41,7 @@ int sumaMax(vector<int> v){
 	return max;
 }
 
-
 void testManuales(){
-
 	vector<vector<int> > bateriaTests;
 	vector<int> resPosta;
 	vector<int> res;
@@ -138,30 +135,21 @@ void testManuales(){
 }
 
 vector<int> parser(char* file){
-	ifstream in(file);
-	vector<int> res;
+  ifstream in(file);
+  vector<int> res;
 
-	if (in.is_open()){
-		
-		string str;
-		istringstream iss;	
-		int cantNum;	
-		int numero;
-
-		
-		getline(in, str);		// Parseo de la primer línea		
-		iss.str(str);		
-		iss >> cantNum;
-		cout << cantNum << endl;
-		
-		getline(in, str); 		//Agarro la fila de numeros;		
-		iss.str(str);
-		for (int i = 0; i < cantNum; ++i){
-			iss >> numero;
-			cout << numero << endl;
-			res.push_back(numero);			
-		}
-	}
-
-	return(res);
+  if (in.is_open()){
+    int cantNum;  
+    int numero;
+  
+    in >> cantNum;
+    if(debug){cout << cantNum << endl;}
+    
+    for (int i = 0; i < cantNum; ++i){
+      in >> numero;
+      if(debug){cout << numero << endl;}
+      res.push_back(numero);      
+    }
+  }
+  return(res);
 }
