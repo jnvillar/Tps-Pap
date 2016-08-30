@@ -27,7 +27,7 @@ int main(){
 	}
 
 	int altura = log2(L)+1;
-	vector< vector<Matriz> > listaProductos;
+	vector< vector<Matriz> > listaProductos;			// CADA POSICION (i=0..altura-1) DEL VECTOR listaProductos CONTIENE TODAS LAS SUBMATRICES QUE RESULTAN DE MULTIPLICAR 2^i MATRICES
 	listaProductos.push_back(listaMtx);
 	for(int i = 1; i<altura; i++){
 		vector<Matriz> prod;
