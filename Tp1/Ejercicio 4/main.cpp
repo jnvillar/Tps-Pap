@@ -27,14 +27,17 @@ int main(){
 	}
 
 	int altura = log2(L)+1;
-	vector< vector<Matriz> > listaProductos;			// CADA POSICION (i=0..altura-1) DEL VECTOR listaProductos CONTIENE TODAS LAS SUBMATRICES QUE RESULTAN DE MULTIPLICAR 2^i MATRICES
-	listaProductos.push_back(listaMtx);
+	vector<Matriz> vacio;
+	vector< vector<Matriz> > listaProductos(altura,vacio);			// CADA POSICION (i=0..altura-1) DEL VECTOR listaProductos CONTIENE TODAS LAS SUBMATRICES QUE RESULTAN DE MULTIPLICAR 2^i MATRICES
+	listaProductos[0] = listaMtx;
 	for(int i = 1; i<altura; i++){
-		vector<Matriz> prod;
-		for(int j = 0; j<N-1; j++){
-			prod.push_back(listaProductos[i-1][j]*listaProductos[i-1][j+i]);
+		int tamanio = listaProductos[i-1].size()-pow(2,i-1);
+		Matriz vacia;
+		vector<Matriz> prod(tamanio,vacia);
+		for(int j = 0; j<tamanio; j++){
+			prod[j] = listaProductos[i-1][j]*listaProductos[i-1][j+pow(2,i-1)];
 		}
-		listaProductos.push_back(prod);
+		listaProductos[i] = prod;
 	}
 
 	vector<Matriz> posiblesSubmatrices = listaProductos[listaProductos.size()-1];
