@@ -1,80 +1,88 @@
 #include "p1.h"
 
-/* Basicamente levanta los datos del standard input */
+/* Basicamente levanta los datos del standard input 
+
+Complejidad: Lineal en cantidad_packs */
 P1::P1(){
 	unsigned int cantidad_packs;
 
 	/* Entrada: standard input */
 	cin >> this->presupuesto;
 	cin >> cantidad_packs;
-	/* ¿ Con listas esto será más rapido ? */
+	
+
 	this->primer_mitad_packs.resize( cantidad_packs/2 );
 	this->segunda_mitad_packs.resize( cantidad_packs - cantidad_packs/2 );
 	
-	for ( unsigned int i = 0; i < this->primer_mitad_packs.size(); i++ ){
+	for ( unsigned int i = 0; i < this->primer_mitad_packs.size(); i++ )
 		cin >> this->primer_mitad_packs[i];
-	}
-	for ( unsigned int i = 0; i < this->segunda_mitad_packs.size(); i++ ){
+
+	for ( unsigned int i = 0; i < this->segunda_mitad_packs.size(); i++ )
 		cin >> this->segunda_mitad_packs[i];
-	}
+
 }
 
-unsigned int P1::agregar_conjunto( vector< unsigned int >& vec, unsigned int mask ){
+/* Dada una mascara (@Param2) y un multiconjunto representado con un vector (@Param1), 
+	se devuelve el resultado de sumar todos los elementos que formarían el subconjunto correspondiente a la máscara. 
+
+Complejidad: Lineal en |@Param1| */
+unsigned int P1::sumar_elementos_subconjunto( vector< unsigned int >& conjunto, unsigned int mask ){
 	unsigned int res = 0;
-	for(unsigned int i = 0; i <= mask; i++){
-		if ( ( (1<<i) & mask ) > 0 ) { // si este elemento esta en la mascara, esta en el subconjunto 
-			res += vec[i];
-		}
-	}
-	return res;
-}
 
-void P1::crear_conjunto_partes_de(vector< unsigned int >& vec, set<unsigned int>& partes_de_ordenado){
-	list<unsigned int> conjunto_partes;
-
-	unsigned int tamano_conj_partes = pow(2,vec.size());
-
-	for( unsigned int mask = 0; mask < tamano_conj_partes; mask++ )
-		conjunto_partes.push_back( agregar_conjunto( vec, mask ) );
-
-	for( list<unsigned int>::iterator it = conjunto_partes.begin(), end = conjunto_partes.end(); it != end; it++ )
-		partes_de_ordenado.insert(*it);
-}
-
-/* Recorro la primer mitad de forma ascendente y la segunda de forma descendente */
-unsigned int P1::calcular_maxima_compra( set<unsigned int> mitad_1, set<unsigned int> mitad_2 ){
-	unsigned int res = 0, sum;
-	set<unsigned int>::iterator it_1 = mitad_1.begin(), it_1_end = mitad_1.end();
-	set<unsigned int>::reverse_iterator rit_2 = mitad_2.rbegin(), rit_2_end = mitad_2.rend();
-
-	while( it_1 != it_1_end && rit_2 != rit_2_end ){
-		sum = *it_1 + *rit_2;
-		if( sum > this->presupuesto ){
-			rit_2++;
-		} else{
-			res = sum;
-			it_1++;
-
-			if( sum == this->presupuesto ) 
-				it_1 = it_1_end; //No voy a conseguir algo mejor que presupuesto
-		}
+	for(unsigned int i = 0; i < conjunto.size(); i++){ // && i <= mask
+		if ( ( (1<<i) & mask ) > 0 ) // el i-ésimo está contenido en la máscara?
+			res += conjunto[i];
 	}
 
 	return res;
 }
 
-/* Parto en dos y armo conjunto de partes 
-	Los inserto en un set (futuro probar con arreglo/heap ).*/
+/* Dado un multiconjunto representado como un vector (@Param1) se genera un conjunto de partes,
+	luego se completa en otro vector (@param2) el valor resultante de aplicar sumatoria a los elementos en el conjunto de partes 
+
+Complejidad: 2^(|conjunto|) * log( 2^(|conjunto|) ) */
+void P1::crear_conjunto_partes_de( vector< unsigned int >& conjunto, vector<unsigned int>& partes_de_conjunto){
+	
+	partes_de_conjunto.resize( pow( 2, conjunto.size() ) );
+
+	for( unsigned int mask = 0; mask < partes_de_conjunto.size(); mask++ ) 			// se itera 2^(|conjunto|) veces
+		partes_de_conjunto[mask] = sumar_elementos_subconjunto( conjunto, mask );		// O(|conjunto|)
+
+	sort( partes_de_conjunto.begin(), partes_de_conjunto.end() ); 					// Ordeno el "conjunto de partes" 
+}
+
+/* Dados dos arreglos ordenados ascendentemente. Recorro al primero forma ascendente y al segundo de forma descendente 
+buscando la suma de un elemento de cada uno que más se aproxime al presupuesto que homero maneja.
+
+Complejidad: lienal en |mitad_1| */
+unsigned int P1::calcular_maxima_compra( vector<unsigned int>& mitad_1, vector<unsigned int>& mitad_2 ){
+	unsigned int res = 0;
+	int j = mitad_2.size()-1;
+
+	for( unsigned int i = 0; i < mitad_1.size(); i++){
+		while( j > 0 && ( mitad_1[i]+mitad_2[j] > this->presupuesto ) )
+			j--;
+
+		if( mitad_1[i]+mitad_2[j] <= this->presupuesto && mitad_1[i]+mitad_2[j] > res )
+			res = mitad_1[i] + mitad_2[j];
+	}
+
+	return res;
+}
+
+
 unsigned int P1::resolver(){
 	unsigned int res = 0;
+	vector<unsigned int> mitad_1, mitad_2;
 
-	set<unsigned int> mitad_1,mitad_2;
+	//Genero el conjunto de partes de la primer mitad de packs
+	crear_conjunto_partes_de( primer_mitad_packs, mitad_1 );
 
-	crear_conjunto_partes_de( primer_mitad_packs, mitad_1);
-	
-	crear_conjunto_partes_de( segunda_mitad_packs, mitad_2);
+	//Genero el conjunto de partes de la segunda mitad de packs
+	crear_conjunto_partes_de( segunda_mitad_packs, mitad_2 );	
 
-	res = calcular_maxima_compra( mitad_1, mitad_2);
+	//Consigo la mayor cantidad de donas que pueda comprar
+	res = calcular_maxima_compra( mitad_1, mitad_2 ); 			
 
 	return res;
 }
