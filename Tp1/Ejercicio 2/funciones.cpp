@@ -1,9 +1,10 @@
 #include "funciones.h"
 
 /**
+ * Esta función permite leer de un archivo
  * archivo es el nombre del archivo que queremos parsear
  */
-pair<int, vector< vector<int> > > parsearEntrada(string archivo)
+pair<int, vector< vector<int> > > parsearArchivo(string archivo)
 {
   int debug = 0; //debug != 0 muestra lo que se parsea
 
@@ -44,6 +45,29 @@ pair<int, vector< vector<int> > > parsearEntrada(string archivo)
   }
   else cout << "No se pudo abrir el archivo " << archivo << "\n"; 
   return res;
+}
+
+/**
+ * Esta función permite leer de stdin
+ */
+pair<int, vector< vector<int> > > parsearStdin()
+{
+  pair<int, vector< vector<int> > > res;
+  
+  int cantAmigas;
+  cin >> cantAmigas;
+  vector< vector<int> > diversionAmigas;
+  diversionAmigas.resize(cantAmigas);
+  for (int i = 0; i < cantAmigas; i++)
+  {
+    diversionAmigas[i].resize(cantAmigas);
+    for (int j = 0; j < cantAmigas; j++)
+      cin >> diversionAmigas[i][j];
+  }
+   res.first = cantAmigas;
+   res.second = diversionAmigas; 
+
+   return res;
 }
 
 /**
