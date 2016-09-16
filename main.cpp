@@ -51,26 +51,26 @@ int main(){
 	int desde,hasta;
 
 	vector<int> lista1;
-	lista1.push_back(2);
+	lista1.push_back(1);
 	vector<int> lista2;
-	lista2.push_back(3);
-	lista2.push_back(1);
+	lista2.push_back(2);
+	lista2.push_back(0);
 	vector<int> lista3;
-	lista3.push_back(2);
+	lista3.push_back(1);
 	vector<int> lista4;
-	lista4.push_back(5);
+	lista4.push_back(4);
 	vector<int> lista5;
-	lista5.push_back(4);
-	lista5.push_back(6);
+	lista5.push_back(3);
+	lista5.push_back(5);
 	vector<int> lista6;
-	lista6.push_back(5);
-	lista6.push_back(7);
+	lista6.push_back(4);
+	lista6.push_back(6);
 	vector<int> lista7;
-	lista7.push_back(6);
-	lista7.push_back(9);
+	lista7.push_back(5);
+	lista7.push_back(8);
 	vector<int> lista8;
 	vector<int> lista9;
-	lista7.push_back(7);
+	lista9.push_back(6);
 
 	listaAdy.push_back(lista1);
 	listaAdy.push_back(lista2);
@@ -90,13 +90,13 @@ int main(){
 	int indice = 0;
 	
 	while(!todosVisitados(visitado)){
-		aVisitar.push(algunoNoVisitado(visitado));
-		visitado[algunoNoVisitado(visitado)] = true;
+		int prox = algunoNoVisitado(visitado);	
+		aVisitar.push(prox);
+		visitado[prox] = true;
 		cantNodos.push_back(0);
 		cantAristas.push_back(0);
 		cantNodos[indice] = 1;
-		cantAristas[indice] =  listaAdy[algunoNoVisitado(visitado)].size();
-		cout << "bbbbbbbbbbb" << endl;
+		cantAristas[indice] =  listaAdy[prox].size();
 		while(!aVisitar.empty()){
 			int nodo = aVisitar.front();
 			aVisitar.pop();
@@ -108,7 +108,6 @@ int main(){
 					cantAristas[indice] +=  listaAdy[listaAdy[nodo][i]].size();
 				}
 			}
-			cout << "aaaaaaa" << endl;
 		}
 		
 		indice++;
@@ -141,10 +140,16 @@ int main(){
 	}
 	*/
 
+
+	for(int i = 0; i< cantAristas.size();i++){
+		cout << "CantAristas: " << cantAristas[i] << endl;
+		cout << "CantNodos: " << cantNodos[i] << endl;
+	}
+
 	int res = 0;
 	for(int i = 0; i< cantAristas.size();i++){
-		if (cantNodos[i]*e > r*(cantNodos[i]*(cantNodos[i]+1)/2 - cantAristas[i])){
-			res += r*(cantNodos[i]*(cantNodos[i]+1)/2 - cantAristas[i]);
+		if (cantNodos[i]*e > r*(cantNodos[i]*(cantNodos[i]-1)/2 - cantAristas[i]/2)){
+			res += r*(cantNodos[i]*(cantNodos[i]-1)/2 - cantAristas[i]/2);
 		} else {
 			res += cantNodos[i]*e;
 		}
