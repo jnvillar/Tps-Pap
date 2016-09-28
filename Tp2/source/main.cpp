@@ -5,8 +5,10 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {	
-	testBfs();
+	//testBfs();
 	//testInvertir();
+	testOrdenKosaraju();
+	testKosaraju();
 
 	return 0;
 }

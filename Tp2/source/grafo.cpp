@@ -48,19 +48,28 @@ class Grafo{
 			}
 		}
 
-		stack<int> bfsKosaraju(int nodo){
-			stack<int> hijos;
-			stack<int> ordenKosaraju;
+		stack<int> ordenKosaraju(){
+			stack<int> res;
 			vector<bool> visitados(cantidadNodos,false);
-			vector<int> nodosAlcanzables;
-			bfsKosarajuRecursion(nodo,hijos,visitados,nodosAlcanzables,ordenKosaraju);
-			return ordenKosaraju;
+
+			for (int i = 0; i < visitados.size(); i++){
+				if(!visitados[i]){
+				stack<int> hijos;
+				vector<int> ordenKosaraju;
+					vector<int> nodosAlcanzables;
+					bfsKosarajuRecursion(i,hijos,visitados,nodosAlcanzables,ordenKosaraju);
+					for (int i = 0; i < ordenKosaraju.size(); i++){
+						res.push(ordenKosaraju[i]);
+					}								
+				}
+			}
+			return res;
 		}
 
-		void bfsKosarajuRecursion(int nodo, stack<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables, stack<int> &ordenKosaraju){
+		void bfsKosarajuRecursion(int nodo, stack<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables, vector<int> &ordenKosaraju){
 				
 			if(debug) cout << nodo << " " << listaAdy[nodo].size() << endl;
-
+			
 			if(!visitados[nodo]){
 				nodosAlcanzables.push_back(nodo);
 				visitados[nodo] = true;
@@ -68,12 +77,11 @@ class Grafo{
 					hijos.push(listaAdy[nodo][i]);
 				}
 
-				for (int i = 0; i < hijos.size(); i++){
+				while(!hijos.empty()){
 					int aux = hijos.top();hijos.pop();
 					bfsKosarajuRecursion(aux,hijos,visitados,nodosAlcanzables,ordenKosaraju);					
-				}
-
-				ordenKosaraju.push(nodo);
+				}				
+				ordenKosaraju.push_back(nodo);
 			}
 		}
 
@@ -88,9 +96,7 @@ class Grafo{
 		void bfsRecursion(int nodo, stack<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables){
 				
 			if(debug) cout << nodo << " " << listaAdy[nodo].size() << endl;
-
-			cout << "hola" << endl;
-
+		
 			if(!visitados[nodo]){
 				nodosAlcanzables.push_back(nodo);
 				visitados[nodo] = true;
@@ -98,7 +104,7 @@ class Grafo{
 					hijos.push(listaAdy[nodo][i]);
 				}
 
-				for (int i = 0; i < hijos.size(); i++){
+				while(!hijos.empty()){
 					int aux = hijos.top();hijos.pop();
 					bfsRecursion(aux,hijos,visitados,nodosAlcanzables);
 				}
@@ -124,7 +130,7 @@ class Grafo{
 					hijos.push(listaAdy[nodo][i]);
 				}
 
-				for (int i = 0; i < hijos.size(); i++){
+				while(!hijos.empty()){
 					int aux = hijos.front();hijos.pop();
 					dfsRecursion(aux,hijos,visitados,nodosAlcanzables);
 				}
@@ -150,28 +156,32 @@ class Grafo{
 			}
 		}
 
-		void kosaraju(){
-
+		vector<vector<int> > componentesKosaraju(stack<int> &ordenKosaraju){
+			vector<vector<int> > res;
 			vector<bool> visitados(cantidadNodos,false);
-			stack<int> ordenKosaraju;
-
-			for (int i = 0; i<visitados.size() && !visitados[i]; i++){
-				vector<int> nodosAlcanzables;
-				nodosAlcanzables = bfs(i);
-
-				for (int j = 0; j < nodosAlcanzables.size(); j++){
-					visitados[nodosAlcanzables[j]] = true;
-				}
-
-				for (int j = 0; j < nodosAlcanzables.size(); j++){
-					ordenKosaraju.push(nodosAlcanzables[j]);
+			while(!ordenKosaraju.empty()){	
+				int nodo = ordenKosaraju.top(); ordenKosaraju.pop();
+				if(!visitados[nodo]){
+					vector<int> componenteConexa;
+					vector<int> nodosAlcanzables = dfs(nodo);
+					for (int i = 0; i < nodosAlcanzables.size(); i++){
+						if(!visitados[nodosAlcanzables[i]]){
+							visitados[nodosAlcanzables[i]] = true;
+							componenteConexa.push_back(nodosAlcanzables[i]);
+						}
+					}
+					res.push_back(componenteConexa);
 				}				
 			}
-
+			return res;
 		}
 
-			
-		
+		vector<vector<int> > kosaraju(){			
+			stack<int> ordKosaraju = ordenKosaraju();
+			invertirAristas();
+			vector<vector<int> > compConex = componentesKosaraju(ordKosaraju);
+			return compConex;
+		}
 
 	private:
 		vector< vector<int> > listaAdy;
