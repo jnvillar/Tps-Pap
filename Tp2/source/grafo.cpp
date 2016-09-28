@@ -156,10 +156,10 @@ class Grafo{
 			}
 		}
 
-		vector<vector<int> > componentesKosaraju(stack<int> &ordenKosaraju){
-			vector<vector<int> > res;
-			vector<bool> visitados(cantidadNodos,false);
-			while(!ordenKosaraju.empty()){	
+		vector<vector<int> > componentesConexas(stack<int> &ordenKosaraju){   //Esto devuelve los nodos que forman parte de una compoenente 
+			vector<vector<int> > res;										  //en un vector de vectores. Saber si dos nodos perteneces a la 
+			vector<bool> visitados(cantidadNodos,false);					  //misma componente es costoso, pero ver todos los nodos de una 
+			while(!ordenKosaraju.empty()){									  //compoente conexa en mas eficiente.No se usa,pero puede servir 
 				int nodo = ordenKosaraju.top(); ordenKosaraju.pop();
 				if(!visitados[nodo]){
 					vector<int> componenteConexa;
@@ -176,10 +176,38 @@ class Grafo{
 			return res;
 		}
 
-		vector<vector<int> > kosaraju(){			
+		vector<int> componentesKosaraju(stack<int> &ordenKosaraju){   //Esto devuelve un vector en el cual cada posicion es un nodo 
+			vector<int> res(cantidadNodos,-1);						  //y su contenido es la componente conexa a la que pertenece 
+			int componenteConexa = -1;								  //de esta manera dados dos nodos podemos saber en O(1) 
+			vector<bool> visitados(cantidadNodos,false);			  //si pertenecen a la misma componente
+			while(!ordenKosaraju.empty()){	
+				int nodo = ordenKosaraju.top(); ordenKosaraju.pop();
+				if(!visitados[nodo]){
+					componenteConexa++;
+					vector<int> nodosAlcanzables = dfs(nodo);
+					for (int i = 0; i < nodosAlcanzables.size(); i++){
+						if(!visitados[nodosAlcanzables[i]]){
+							visitados[nodosAlcanzables[i]] = true;
+							res[nodosAlcanzables[i]] = componenteConexa;
+						}
+					}					
+				}				
+			}
+			return res;
+		}
+
+
+		vector<vector<int> > kosaraju2(){			
 			stack<int> ordKosaraju = ordenKosaraju();
 			invertirAristas();
-			vector<vector<int> > compConex = componentesKosaraju(ordKosaraju);
+			vector<vector<int> > compConex = componentesConexas(ordKosaraju);
+			return compConex;
+		}
+
+		vector<int> kosaraju(){			
+			stack<int> ordKosaraju = ordenKosaraju();
+			invertirAristas();
+			vector<int> compConex = componentesKosaraju(ordKosaraju);
 			return compConex;
 		}
 

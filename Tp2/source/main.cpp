@@ -7,9 +7,10 @@ int main(int argc, char const *argv[])
 {	
 	//testBfs();
 	//testInvertir();
-	testOrdenKosaraju();
-	testKosaraju();
-
+	//testOrdenKosaraju();
+	//testKosaraju1a();
+	//testKosaraju1b();
+	
 	return 0;
 }
 
