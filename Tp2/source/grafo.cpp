@@ -38,6 +38,15 @@ class Grafo{
 			return listaAdy[nodo];
 		}
 
+		void imprimirGrafo(){
+			for(int i = 0; i< cantidadNodos; i++){
+				cout << i << " -> ";
+				for(int j = 0; j<listaAdy[i].size(); j++){
+					cout << listaAdy[i][j] << "  ";
+				}
+				cout << endl;
+			}
+		}
 	private:
 		vector< vector<int> > listaAdy;
 		int cantidadNodos;

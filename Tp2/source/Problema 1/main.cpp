@@ -24,19 +24,24 @@ vector<int> bfs(Grafo graph, int nodoInical, int nodoFinal, vector< vector<int> 
 			if(!visitados[vecinos[i]] && capacidad[nodo][vecinos[i]]-funcFlujo[nodo][vecinos[i]]>0){
 				cola.push(vecinos[i]);
 				padre[vecinos[i]] = nodo;
+				visitados[vecinos[i]] = true;
 			}
 		}
 	}
 
+
 	vector<int> camino;
-	int nodo = nodoFinal;
-	camino.push_back(nodo);
-	while(nodo != padre[nodo]){
-		nodo = padre[nodo];
+	if(visitados[nodoFinal]){
+		int nodo = nodoFinal;
 		camino.push_back(nodo);
+		while(nodo != padre[nodo]){
+			nodo = padre[nodo];
+			camino.push_back(nodo);
+		}
+
+		reverse(camino.begin(),camino.end());
 	}
 
-	reverse(camino.begin(),camino.end());
 	return camino;
 }
 
@@ -49,11 +54,7 @@ int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
 		if(caminoAumento.size() == 0){
 			break;
 		}
-for (int i = 0; i < caminoAumento.size(); ++i)
-{
-	cout << caminoAumento[i] << "  ";
-}
-cout << endl;
+
 		int maxAumento = 10000;
 		for(int i = 0; i<caminoAumento.size()-1; i++){
 			int a = caminoAumento[i];
@@ -63,7 +64,7 @@ cout << endl;
 		for(int i = 0; i<caminoAumento.size()-1; i++){
 			int a = caminoAumento[i];
 			int b = caminoAumento[i+1];
-			capacidad[a][b] += maxAumento;
+			funcFlujo[a][b] += maxAumento;
 		}
 	}
 	int res = 0;
@@ -89,10 +90,10 @@ int main(){
 			alumnos.push_back(i);
 		}
 	}
-	Grafo graph(2*n+2);			// n_in en posiciones pares, n_out en impares, nodo n = s, nodo n+1 = t
+	Grafo graph(2*n+2);			// n_in en posiciones pares, n_out en impares, nodo cantNodos-2 = s, nodo cantNodos-2 = t
 	int cantNodos = 2*n+2;
 	
-	for(int i = 0; i<cantNodos; i+=2){
+	for(int i = 0; i<cantNodos-2; i+=2){
 		graph.agregarArista(i,i+1);
 	}
 	for(int i = 0; i<m; i++){
@@ -105,11 +106,12 @@ int main(){
 		graph.agregarArista(2*hasta+1,2*desde);
 	}
 	for(int i = 0; i<alumnos.size(); i++){
-		graph.agregarArista(n,2*alumnos[i]);
+		graph.agregarArista(cantNodos-2,2*alumnos[i]);
 	}
 	for(int i = 0; i<escuelas.size(); i++){
-		graph.agregarArista(2*escuelas[i]+1,n+1);
+		graph.agregarArista(2*escuelas[i]+1,cantNodos-1);
 	}
+
 
 	vector<int> ceros(cantNodos,0);
 	vector< vector<int> > capacidad(cantNodos,ceros);
@@ -120,7 +122,7 @@ int main(){
 		}
 	}
 
-	int res = flujoMaximo(graph,n,n+1,capacidad);
+	int res = flujoMaximo(graph,cantNodos-2,cantNodos-1,capacidad);
 	cout << res << endl;
 	return 0;
 }
