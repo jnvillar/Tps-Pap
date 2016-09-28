@@ -5,7 +5,8 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {	
-	testInvertir();
+	testBfs();
+	//testInvertir();
 
 	return 0;
 }

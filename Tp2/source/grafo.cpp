@@ -2,9 +2,10 @@
 #include <vector>
 #include <assert.h> 
 #include <queue>
+#include <stack>
 
 using namespace std;
-bool debug = true;
+bool debug = false;
 
 class Grafo{
 	public:
@@ -47,15 +48,72 @@ class Grafo{
 			}
 		}
 
+		stack<int> bfsKosaraju(int nodo){
+			stack<int> hijos;
+			stack<int> ordenKosaraju;
+			vector<bool> visitados(cantidadNodos,false);
+			vector<int> nodosAlcanzables;
+			bfsKosarajuRecursion(nodo,hijos,visitados,nodosAlcanzables,ordenKosaraju);
+			return ordenKosaraju;
+		}
+
+		void bfsKosarajuRecursion(int nodo, stack<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables, stack<int> &ordenKosaraju){
+				
+			if(debug) cout << nodo << " " << listaAdy[nodo].size() << endl;
+
+			if(!visitados[nodo]){
+				nodosAlcanzables.push_back(nodo);
+				visitados[nodo] = true;
+				for (int i = 0; i < listaAdy[nodo].size(); i++){
+					hijos.push(listaAdy[nodo][i]);
+				}
+
+				for (int i = 0; i < hijos.size(); i++){
+					int aux = hijos.top();hijos.pop();
+					bfsKosarajuRecursion(aux,hijos,visitados,nodosAlcanzables,ordenKosaraju);					
+				}
+
+				ordenKosaraju.push(nodo);
+			}
+		}
+
+		vector<int> bfs(int nodo){
+			stack<int> hijos;
+			vector<bool> visitados(cantidadNodos,false);
+			vector<int> nodosAlcanzables;
+			bfsRecursion(nodo,hijos,visitados,nodosAlcanzables);
+			return nodosAlcanzables;
+		}
+
+		void bfsRecursion(int nodo, stack<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables){
+				
+			if(debug) cout << nodo << " " << listaAdy[nodo].size() << endl;
+
+			cout << "hola" << endl;
+
+			if(!visitados[nodo]){
+				nodosAlcanzables.push_back(nodo);
+				visitados[nodo] = true;
+				for (int i = 0; i < listaAdy[nodo].size(); i++){
+					hijos.push(listaAdy[nodo][i]);
+				}
+
+				for (int i = 0; i < hijos.size(); i++){
+					int aux = hijos.top();hijos.pop();
+					bfsRecursion(aux,hijos,visitados,nodosAlcanzables);
+				}
+			}
+		}
+
 		vector<int> dfs(int nodo){
 			queue<int> hijos;
-			vector<int> visitados(cantidadNodos,false);
+			vector<bool> visitados(cantidadNodos,false);
 			vector<int> nodosAlcanzables;
 			dfsRecursion(nodo,hijos,visitados,nodosAlcanzables);
 			return nodosAlcanzables;
 		}
 
-		void dfsRecursion(int nodo, queue<int> &hijos, vector<int> &visitados, vector<int> &nodosAlcanzables){
+		void dfsRecursion(int nodo, queue<int> &hijos, vector<bool> &visitados, vector<int> &nodosAlcanzables){
 				
 			if(debug) cout << nodo << " " << listaAdy[nodo].size() << endl;
 
@@ -73,6 +131,8 @@ class Grafo{
 			}
 		}
 
+
+
 		void invertirAristas(){
 
 			vector< vector<int> > aristasViejas = listaAdy;
@@ -89,6 +149,29 @@ class Grafo{
 				}
 			}
 		}
+
+		void kosaraju(){
+
+			vector<bool> visitados(cantidadNodos,false);
+			stack<int> ordenKosaraju;
+
+			for (int i = 0; i<visitados.size() && !visitados[i]; i++){
+				vector<int> nodosAlcanzables;
+				nodosAlcanzables = bfs(i);
+
+				for (int j = 0; j < nodosAlcanzables.size(); j++){
+					visitados[nodosAlcanzables[j]] = true;
+				}
+
+				for (int j = 0; j < nodosAlcanzables.size(); j++){
+					ordenKosaraju.push(nodosAlcanzables[j]);
+				}				
+			}
+
+		}
+
+			
+		
 
 	private:
 		vector< vector<int> > listaAdy;
