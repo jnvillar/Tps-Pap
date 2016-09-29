@@ -18,7 +18,11 @@ class Grafo{
 			cantidadAristas = 0;
 		}
 
-		 
+		 void agregarNodo(){
+		 	cantidadNodos++;
+		 	vector<int> vacia;				
+			listaAdy.push_back(vacia);
+		 }
 
 		void agregarArista(int nod1, int nod2){
 			listaAdy[nod1].push_back(nod2);
