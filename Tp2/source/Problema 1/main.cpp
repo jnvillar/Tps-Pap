@@ -46,7 +46,13 @@ vector<int> bfs(Grafo graph, int nodoInical, int nodoFinal, vector< vector<int> 
 }
 
 int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
-	
+	for(int i = 0; i<graph.cantNodos(); i++){
+		vector<int> vecinos = graph.nodosAdyacentes(i);
+		for(int j = 0; j<vecinos.size(); j++){
+			graph.agregarArista(vecinos[j],i);
+		}
+	}
+
 	vector<int> ceros(graph.cantNodos(),0);
 	vector< vector<int> > funcFlujo(graph.cantNodos(),ceros);
 	while(true){
@@ -65,6 +71,7 @@ int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
 			int a = caminoAumento[i];
 			int b = caminoAumento[i+1];
 			funcFlujo[a][b] += maxAumento;
+			funcFlujo[b][a] -= maxAumento;
 		}
 	}
 	int res = 0;

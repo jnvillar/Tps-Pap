@@ -48,11 +48,23 @@ vector<int> bfs(Grafo graph, int nodoInical, int nodoFinal, vector< vector<int> 
 }
 
 int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
-	
+	for(int i = 0; i<graph.cantNodos(); i++){
+		vector<int> vecinos = graph.nodosAdyacentes(i);
+		for(int j = 0; j<vecinos.size(); j++){
+			graph.agregarArista(vecinos[j],i);
+		}
+	}
 	vector<int> ceros(graph.cantNodos(),0);
 	vector< vector<int> > funcFlujo(graph.cantNodos(),ceros);
 	while(true){
 		vector<int> caminoAumento = bfs(graph,s,t,capacidad,funcFlujo);
+/*
+for (int i = 0; i < caminoAumento.size(); ++i)
+{
+	cout << caminoAumento[i] << "  ";
+}
+cout << endl;
+*/
 		if(caminoAumento.size() == 0){
 			break;
 		}
@@ -67,6 +79,7 @@ int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
 			int a = caminoAumento[i];
 			int b = caminoAumento[i+1];
 			funcFlujo[a][b] += maxAumento;
+			funcFlujo[b][a] -= maxAumento;
 		}
 	}
 	int res = 0;
@@ -83,7 +96,7 @@ int matchingBipartito(Grafo graph, int cantNodosA, int cantNodosB){
 	graph.agregarNodo();
 	graph.agregarNodo();
 	for(int i = 0; i<cantNodosA; i++){
-		graph.agregarArista(s,cantNodosA);
+		graph.agregarArista(s,i);
 	}
 	for(int i = 0; i<cantNodosB; i++){
 		graph.agregarArista(cantNodosA+i,t);
@@ -98,7 +111,11 @@ int matchingBipartito(Grafo graph, int cantNodosA, int cantNodosB){
 		}
 	}
 
+//graph.imprimirGrafo();
+
 	int res = flujoMaximo(graph,s,t,capacidad);
+//cout << res << endl;
+	return res;
 
 }
 
