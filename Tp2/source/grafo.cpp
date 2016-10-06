@@ -62,8 +62,8 @@ class Grafo{
 				vector<int> ordenKosaraju;
 					vector<int> nodosAlcanzables;
 					bfsKosarajuRecursion(i,hijos,visitados,nodosAlcanzables,ordenKosaraju);
-					for (int i = 0; i < ordenKosaraju.size(); i++){
-						res.push(ordenKosaraju[i]);
+					for (int j = 0; j < ordenKosaraju.size(); j++){
+						res.push(ordenKosaraju[j]);
 					}								
 				}
 			}
