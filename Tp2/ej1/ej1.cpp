@@ -2,7 +2,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include "../grafo.cpp"
+#include "grafo.cpp"
 
 using namespace std;
 
