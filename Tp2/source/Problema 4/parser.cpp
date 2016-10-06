@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../grafo.cpp"
+#include "grafo.cpp"
 
 using namespace std;
 
