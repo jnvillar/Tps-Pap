@@ -139,49 +139,29 @@ int main(){
 	}
 
 	Grafo graph(a);		// este grafo contendra un nodo por cada accion, y una arista i -> j si todos los dias, la accion i es menor a la accion j
-	vector<int> nodoIn(a,-1);		// aca voy a guardar que nodos perteneces a la componente B del grafo bipartito
-	vector<int> nodoOut(a,-1);		// aca voy a guardar que nodos perteneces a la componente A del grafo bipartito
-	int indiceIn = 0;
-	int indiceOut = 0;
+	
 	
 	for(int i = 0; i<a; i++){
 		for(int j = 0; j<a; j++){
 			if(i != j){
 				if (esMenor(acciones[i],acciones[j])){		// si todos los dias, la accion i es menor a la accion j
 					graph.agregarArista(i,j);				// agrego una arista i -> j
-					if(nodoOut[i]<0){				// si i no pertenecia a A, lo agrego
-						nodoOut[i] = indiceOut;
-						indiceOut++;
-					}
-					if(nodoIn[j]<0){				// si j no pertenecia a B, lo agrego
-						nodoIn[j] = indiceIn;
-						indiceIn++;
-					}
 				}
 			}
 		}
 	}
 	
-	int cantNodosBipartitoA = 0;
-	int cantNodosBipartitoB = 0;
-	for(int i = 0; i<a; i++){		// cuento la cantidad de nodos de cada conjunto
-		if (nodoOut[i]>=0){
-			cantNodosBipartitoA++;
-		}
-		if (nodoIn[i]>=0){
-			cantNodosBipartitoB++;
-		}
-	}
-	Grafo graphBipartite(cantNodosBipartitoA + cantNodosBipartitoB);		// creo el grafo bipartito
+	
+
+	Grafo graphBipartite(2*a);		// creo el grafo bipartito
 	for(int i = 0; i< graph.cantNodos(); i++){			// agrego una arista de i € A -> j € B si existe una arista i -> j en el grafo original
 		vector<int> vecinos = graph.nodosAdyacentes(i);
 		for(int j = 0; j<vecinos.size(); j++){
-			graphBipartite.agregarArista(nodoOut[i],cantNodosBipartitoA+nodoIn[vecinos[j]]);
+			graphBipartite.agregarArista(i,a+vecinos[j]);
 		}
 	}
 
-
-	int res = graph.cantNodos() - matchingBipartito(graphBipartite,cantNodosBipartitoA,cantNodosBipartitoB); 		// res (la mayor anticadena = menor cubrimiento por caminos) es igual a la cantidad de nodos del grafo original - el matching maximo del grafo bipartito formado (Kőnig's theorem)
+	int res = a - matchingBipartito(graphBipartite,a,a); 		// res (la mayor anticadena = menor cubrimiento por caminos) es igual a la cantidad de nodos del grafo original - el matching maximo del grafo bipartito formado (Kőnig's theorem)
 	cout << res << endl;
 	return 0;
 }
