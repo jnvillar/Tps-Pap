@@ -33,26 +33,6 @@ bool Calle::operator!=(const Calle& c) const{
     return (this->origen != c.origen) || (this->destino != c.destino);
 }
 
-class GrafoCondenso{
-    public:
-        vector< vector< int > > list_ady; //lista de adyacencias
-        vector< int > cant_nodos;
-        GrafoCondenso();
-        void agregarVertice(int );
-        void agregarArista(int, int);
-};
-
-GrafoCondenso::GrafoCondenso(){}
-void GrafoCondenso::agregarArista(int v1, int v2){
-    list_ady[v1].push_back(v2);
-    list_ady[v2].push_back(v1);
-}
-void GrafoCondenso::agregarVertice(int c_nodos){
-    vector<int> vacio;
-    list_ady.push_back(vacio);          //lista de vecinos vacía nueva
-    cant_nodos.push_back(c_nodos);   //nueva cant_vecinos
-}
-
 class Grafo{
     public:
         Grafo(int);
@@ -63,23 +43,15 @@ class Grafo{
         int     queryA(int, int);
         bool    queryB(int );
         int     queryC(int );
-        
-        /*TESTING*/
-        void    info();
-        void    puentes();
-        void    todasLasC();
 
     private:
         /*Para armar el grafo y aplciar el DFS y BFS casi de pizarra*/
         vector < vector< int > > list_ady;
+        vector < vector< int > > list_ady_sin_puentes;
         vector < Calle > calles;
-        vector < int > low, depth, parent, numero_componente;
+        vector < int > low, depth, parent, numero_componente, componente;
         vector <bool> punto_art;
         
-        /* Para condensar el grafo */
-        int     contador_componentes;
-        GrafoCondenso g_condenso;
-
         void    BCCRecursivo(int v, int d, stack<Calle> &calles_visitadas);
         void    rearmarComponenteBiconexaHasta(Calle, stack<Calle>&);
         void    rearmarCompBiconexa(stack<Calle>&);
@@ -87,18 +59,21 @@ class Grafo{
         int     BFS(int, int );
         bool    es_puente(int, int );
         void    BFS_cant_nodos();
+        void 	armarGrafoSinPuenteS();
+        void	contarNodosPorSubgrafo();
+        int  	BFS_contador_nodos( vector<bool> &vis, int v, int num_comp);
 };
 
 //El constructor toma la cantidad de nodos del grafo (esquinas del problema)
 //Resizeo todas las variables que voy a utilizar en mi clase
 Grafo::Grafo(int V){
     list_ady.resize(V);
+    list_ady_sin_puentes.resize(V);
     low.resize(V,NIL);
     depth.resize(V,NIL);
     parent.resize(V,NIL);
     numero_componente.resize(V,NIL);
     punto_art.resize(V,false);
-    contador_componentes=0;
 }
 
 void Grafo::agregarArista(int v1, int v2){
@@ -110,111 +85,30 @@ void Grafo::agregarArista(int v1, int v2){
 //Desapilo hasta cierta arista y las apilo en otra pila para luego llamar a rearmarCompBiconexa.
 //La arista hasta tiene que existir en la pila aristas_bcc
 void Grafo::rearmarComponenteBiconexaHasta(Calle hasta, stack<Calle> &aristas_bcc){
-    //cout << "rearmarComponenteBiconexaHasta::Size " << aristas_bcc.size() << endl;
-    //cout << "From " << aristas_bcc.top().origen << "--" << aristas_bcc.top().destino << " " << "to" << hasta.origen << "--" << hasta.destino <<endl;
     stack<Calle> aux;
+    
     while( aristas_bcc.top() != hasta ){
-        aux.push(aristas_bcc.top());
-        //cout << aristas_bcc.top().origen << "--" << aristas_bcc.top().destino << " ";
+        aux.push( aristas_bcc.top() );
         aristas_bcc.pop();
     }
-    //cout << aristas_bcc.top().origen << "--" << aristas_bcc.top().destino;
+    
     aux.push(aristas_bcc.top());
     aristas_bcc.pop();
+
     rearmarCompBiconexa(aux);
-    cout << endl;
 }
 
 //Desapilo todas las aristas de la pila, cuento la cantidad de elementos, y creo los nodos correspondientes en el black-cut tree
 //Cada vez que cierro una componente biconexa, es agregar al menos un nodo al black cut tree
 void Grafo::rearmarCompBiconexa(stack<Calle> &aristas_bcc){
-    //cout << "rearmarCompBiconexa::Size " << aristas_bcc.size() << endl; 
-    
-    //aristas_bcc.size() == 1 <=> aristas_bcc.top() es puente
-    int aux, cant_nodos = 0; 
-    vector<int> vertices;
-    vector<bool> recorridos;
-
-    int nro_componente_actual = contador_componentes;
-    contador_componentes++;
-    
-    //Creo mi nodo en el grafo condensado
-    g_condenso.agregarVertice(0);
-
-    //Me armo un arreglo con las aristas por facilidad
-    while( aristas_bcc.size() > 0 ){
-        //cout << aristas_bcc.top().origen << "--" << aristas_bcc.top().destino << " ";
-        vertices.push_back(aristas_bcc.top().destino);
-        vertices.push_back(aristas_bcc.top().origen);
-        cout << aristas_bcc.top().origen << "--" << aristas_bcc.top().destino << " " << endl;
+    while( aristas_bcc.size() > 0 )
         aristas_bcc.pop();
-    }
-
-    for(int i = 0; i < vertices.size(); i++){
-        cout << "Vertice " << vertices[i]<< endl;
-        if( numero_componente[ vertices[i] ] < nro_componente_actual ){
-            if( numero_componente[ vertices[i] ] == NIL){
-                //Este vértice no estaba en ninguna otra componente
-                cant_nodos++;
-                
-                if( punto_art[vertices[i]]){    //puede ser pto de art
-
-                    //lo agrego al grafo, y agrego una arista con esta componente
-                    g_condenso.agregarVertice(cant_nodos);
-                    g_condenso.agregarArista(nro_componente_actual, contador_componentes);
-                    numero_componente[ vertices[i] ] = contador_componentes;
-                    cout << "punto de art "<< vertices[i] << "como comp " << contador_componentes << endl;
-                    cout << "Arista 2 nueva de " << nro_componente_actual << " a " << contador_componentes<<endl;
-                    contador_componentes++;
-                }else{
-                    //Figurará como parte de esta componente, para las futuras componentes biconexas.
-                    numero_componente[ vertices[i] ] = nro_componente_actual; 
-                }
-            }
-            else {
-                //En este punto, el vértice en cuestión no pertence a esta componente pero ya está agregado en otra. 
-                //Entonces la componente biconexa donde pertenece está en g_condenso.
-                
-                /* vertices.size() >= 2 porque no hay nodos aislados (G conexo). 
-                    Este nodo es un punto de articulación que cerro un ciclo con depth mayor.
-                    Si es 2, entonces este vértice es pto de art con una componente que tiene un puente. No suma en nuestro caso más que si mismo.
-                    Si es > 2, entonces este punto de art permite llegar a vértices de otra componente biconexa, y suma la cantidad de su componente.*/
-                    
-                if( vertices.size() > 2 ){
-                    aux = g_condenso.cant_nodos[ numero_componente[ vertices[i] ] ];
-                    aux = aux * (aux > 2) + 1 * (aux <= 2);
-                }
-                else{
-                    aux = 1;
-                }
-
-                cant_nodos += aux;
-                
-                //(Desde_actual_componente , Hasta_pto_de_art)
-                cout << "Arista 1 nueva de " << nro_componente_actual << " a " << numero_componente[ vertices[i] ]<<endl;
-                cout << "Agrego " << aux << " nodos " << endl;
-                g_condenso.agregarArista( nro_componente_actual, numero_componente[ vertices[i] ]);
-
-                if( vertices.size() > 2){
-                    //Notar que si ya estaba en otra componente, ponerlo en esta es hacer que esté en una comp con el min de cant_nodos
-                    //Entonces no sirve.
-                    numero_componente[ vertices[i] ] = nro_componente_actual;
-                }
-            }
-        }
-    }
-
-    //Agrego al vértice en el grafo condensado que representa esta componente, 
-    //la cantidad de vértices a los que puede llegar con las reglas de la QueryC
-    g_condenso.cant_nodos[nro_componente_actual] = cant_nodos;
-
-    cout << "La componente conexa nro " << nro_componente_actual << " termino con " << cant_nodos << endl;
 }
 
-// A recursive function that finds and prints strongly connected
-// components using DFS traversal
-// v --> The vertex to be visited next
-// aristas_visitadas -- >> To store visited edges
+/*Como lo vimos en clase, es recorrer un grafo de la misma manera que DFS lo hace, pero persistiendo más información en arreglos, 
+sobre la posición de cada vértice, puntualmente el padre, low, y depth.
+Con lo cual después podemos encontrar las diferentes componentes biconexas, los puntos de articulación, y los puentes.*/
+//Complejidad: O(N+M) = O(M)
 void Grafo::BCCRecursivo(int v, int d, stack<Calle> &calles_visitadas){
     
     //Por defecto mi low y depth es mi profundidad en el arbol DFS
@@ -231,11 +125,7 @@ void Grafo::BCCRecursivo(int v, int d, stack<Calle> &calles_visitadas){
             c_hijos++;
             parent[h] = v;
             
-            //Apilo la calle hasta mi vecino
-            //cout << "Apilo " << v << " " << h <<endl;
             calles_visitadas.push( Calle(v,h) );
-            //cout << "TOP " << calles_visitadas.top().origen << " " << calles_visitadas.top().destino <<endl;
-            //info();
 
             //Llamado recursivo en mi vecino, siendo h un nivel más profundo que v en el árbol
             BCCRecursivo(h, d+1, calles_visitadas);
@@ -251,62 +141,13 @@ void Grafo::BCCRecursivo(int v, int d, stack<Calle> &calles_visitadas){
             }
         
         }else if(h != parent[v] && depth[h] < low[v]){
-
             low[v]  = min(low[v], depth[h]);
-            //cout << "Apilo " << v << " " << h <<endl;
             calles_visitadas.push( Calle(v,h) );
-            //cout << "TOP " << calles_visitadas.top().origen << " " << calles_visitadas.top().destino <<endl;
-            //info();
         }
     }
 }
 
-/*
-Se recorren las componentes biconexas en el grafo condensado, en orden de decreciente de finalización ( Ultima en finalizar -> primera en finalizar )
-En el DFS anterior, cuando una componente biconexa se formaba, si contenía puntos de articulación que pertenecían a otras componenentes
-y estas no fueran puentes, se incluían la cantidad de vértices de esa componente para la queryC.
 
-Pero para cumplir con las complejidades, en vez de actualizar cada rama, cada vez que se incrementara la máxima cantidad de "vértices compartidos",
-Se dejó el resultado en las componentes biconexas con mayor tiempo de finalización, y desde ahí se actualiza ahora con BFS. 
-*/
-void Grafo::BFS_cant_nodos(){
-    /*cout << "lista de ady" <<endl;
-    for (int i = 0; i < g_condenso.list_ady.size();i++){
-        cout << "comp " << i << endl;
-        for(int j=0; j < g_condenso.list_ady[i].size(); j++){
-            cout << " " <<  g_condenso.list_ady[i][j];
-        }
-        cout <<endl;
-    }*/
-    queue <int> cola;
-    vector <bool> recorridos (g_condenso.cant_nodos.size(),false);
-    int v,w;
-    //Encolo la última componente que finalizó
-
-    recorridos[g_condenso.cant_nodos.size()-1] = true;
-    cola.push(g_condenso.cant_nodos.size()-1);
-
-    while(!cola.empty()){
-        v = cola.front();
-        cola.pop();
-
-        for(int i = 0; i < g_condenso.list_ady[v].size(); i++){
-            w = g_condenso.list_ady[v][i];
-            //cout << "w " << w<<endl;
-            if(!recorridos[w]){
-                recorridos[w] = true;
-                cola.push(w);
-
-                //si w no es un puente ( != 2), entonces v lo contó para calcular su cantidad de nodos
-                if( g_condenso.cant_nodos[w] > 2 || g_condenso.cant_nodos[w] == 1 ) 
-                    g_condenso.cant_nodos[w] = max(g_condenso.cant_nodos[v], g_condenso.cant_nodos[w]);
-            }
-        }
-    }
-
-}
-
-// The function to do DFS traversal. It uses BCCRecursivo()
 void Grafo::BCC(){
     stack<Calle> aristas_visitadas;
    
@@ -318,7 +159,61 @@ void Grafo::BCC(){
     if(aristas_visitadas.size() > 0)
         rearmarCompBiconexa(aristas_visitadas);
 
-    BFS_cant_nodos();
+    //Genero un grafo sin los puentes
+    armarGrafoSinPuenteS();
+    //Cuento los nodos de cada subgrafo
+    contarNodosPorSubgrafo();
+}
+
+//Genero una copia del grafo original pero sin las aristas puentes
+//Complejidad: O(N+M) = O(M)
+void Grafo::armarGrafoSinPuenteS(){
+	for(int i = 0; i < list_ady.size(); i++){
+		for(int j= 0; j < list_ady[i].size(); j++){
+
+			if( !es_puente( i, list_ady[i][j]) )
+				list_ady_sin_puentes[i].push_back( list_ady[i][j] );
+		}
+	}
+}
+
+//Cuento los nodos de cada subgrafo lanzando BFS desde cada uno y contando la cantidad de elementos
+//O(N+M) = O(M)
+void Grafo::contarNodosPorSubgrafo(){
+	vector < bool > visitados ( list_ady_sin_puentes.size(), false );
+	int iteracion = -1;
+
+	for( int i = 1; i< visitados.size(); i++){
+		if( !visitados[i] ){
+			iteracion++;
+			componente.push_back( BFS_contador_nodos( visitados, i, iteracion) );
+		}
+	}
+}
+
+int Grafo::BFS_contador_nodos( vector<bool> &vis, int v, int num_comp){
+	
+	int contador = 0;
+	queue <int> cola;
+	cola.push(v);
+	vis[v] = 1;
+
+	while(!cola.empty()){
+		int w = cola.front();
+		contador++;
+		numero_componente[w] = num_comp;
+		cola.pop();
+
+		for(int i = 0; i < list_ady_sin_puentes[w].size(); i++){
+			
+			if( !vis[ list_ady_sin_puentes[w][i] ] ){
+				cola.push( list_ady_sin_puentes[w][i] );
+				vis[ list_ady_sin_puentes[w][i] ] = true;
+			}
+
+		}
+	}
+	return contador;
 }
 
 /*  QUERIES */
@@ -329,46 +224,10 @@ bool Grafo::queryB(int num_calle){
     return es_puente(calles[num_calle].origen, calles[num_calle].destino);
 }
 int Grafo::queryC(int vertice){
-    return g_condenso.cant_nodos[ numero_componente[ vertice ] ] * (g_condenso.cant_nodos[ numero_componente[ vertice ] ] != 2) ; //no me resto porque no me cuento
+    return componente[ numero_componente[ vertice ] ] - 1; //me resto a mí
 }
 
 int main(){
-/*
-    Grafo g(10);
-    g.agregarArista(9,1);
-    g.agregarArista(1,2);
-    g.agregarArista(2,3);
-    g.agregarArista(3,4);
-    g.agregarArista(1,4);
-    g.agregarArista(1,5);
-    g.agregarArista(6,5);
-    g.agregarArista(6,7);
-    g.agregarArista(1,7);
-    g.agregarArista(6,8);
-    g.BCC();*/
-
-/*
-//TESTING queryA
-    cout << "desde 1 a 8 " << g.queryA(1,8)<<endl;
-    cout << "desde 8 a 1 " << g.queryA(8,1)<<endl;
-    cout << "desde 8 a 9 " << g.queryA(8,9)<<endl;
-    cout << "desde 9 a 8 " << g.queryA(9,8)<<endl;
-    cout << "desde 1 a 6 " << g.queryA(1,6)<<endl;
-    cout << "desde 2 a 6 " << g.queryA(2,6)<<endl;
-    cout << "desde 3 a 9 " << g.queryA(3,9)<<endl;
-    cout << "desde 3 a 8 " << g.queryA(3,8)<<endl;
-*/
-
-
-//TESTING queryB
-    //g.puentes();
-
-//TESTING queryC
-    //g.todasLasC();
-
-    //cout << "Above are " << count << " biconnected components in graph";
-//
-
     int V, E, origen, destino, cant_queries, calle, esquina;
     char t_query;
 
@@ -386,7 +245,6 @@ int main(){
     g.BCC();
 
     //Leo las querys y voy respondiendo
-    cout <<endl;    
     cin >> cant_queries;
 
     for (int i = 0; i < cant_queries; i++){
@@ -396,24 +254,18 @@ int main(){
         switch(t_query){
             case 'A':
                 cin >>origen >> destino;
-                cout << "query A" << origen << " " <<destino<<endl;
                 cout << g.queryA(origen, destino) <<endl;
                 break;
             case 'B':
                 cin >> calle;
-                cout << "query B " <<calle<<endl;
                 cout << g.queryB(calle-1) << endl;
                 break;
             case 'C':
                 cin >> esquina;
-                cout << "query C " <<esquina<<endl;
                 cout << g.queryC(esquina) << endl;
                 break;
         }
     }
-
-    //g.puentes();
-    g.todasLasC();
     return 0;
 }
 
@@ -466,37 +318,4 @@ int Grafo::BFS(int v_inicio, int v_destino){
     }
 
     return cant_puentes_hasta[v_destino];
-}
-
-
-
-
-/*TESTING*/
-
-void Grafo::info(){
-    cout << "parent: ";
-    for(int i = 0; i< parent.size();i++){
-        cout << parent[i] << " ";
-    }
-    cout << endl;
-    cout << "low:    ";
-    for(int i = 0; i< low.size();i++){
-        cout << low[i] << " ";
-    }
-    cout << endl;
-    cout << "depth:  ";
-    for(int i = 0; i< depth.size();i++){
-        cout << depth[i] << " ";
-    }
-    cout << endl;
-}
-void Grafo::puentes(){
-    cout << "testeando puentes" <<endl;
-    for(int i = 0; i< calles.size(); i++){
-        cout << calles[i].origen <<"--" << calles[i].destino << " "<< queryB(i)<<endl;
-    }
-}
-void Grafo::todasLasC(){
-        for(int i =1; i < list_ady.size(); i++)
-            cout << i << " tiene "<< queryC(i) << " cant bcc con el " << endl;
 }
