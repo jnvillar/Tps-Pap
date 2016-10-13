@@ -14,7 +14,6 @@ class SegmentTree{
 		SegmentTree(vector<int> val){
 
 			if (pow(2,(int )log2(val.size())) != val.size()){
-				cout << " aaa" << endl;
 				val.resize(pow(2,(int )log2(val.size())+1),0);
 			}
 			n = val.size();
