@@ -5,7 +5,7 @@
 using namespace std;
 
 void completarTablaKMP(string palabra, vector<int> &tablaKMP){
-	int pos = 2;				//Posicion a ser computada de la palabra
+	int pos = 2;				
 	int cnd = 0;
 	tablaKMP[0] = -1;
 	tablaKMP[1] = 0;
