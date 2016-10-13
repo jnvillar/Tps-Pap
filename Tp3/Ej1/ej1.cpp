@@ -5,7 +5,7 @@
 using namespace std;
 
 void completarTablaKMP(string palabra, vector<int> &tablaKMP){
-	int pos = 2;				//Posicion a ser computada de la palabra
+	int pos = 2;				
 	int cnd = 0;
 	tablaKMP[0] = -1;
 	tablaKMP[1] = 0;
@@ -26,20 +26,48 @@ void completarTablaKMP(string palabra, vector<int> &tablaKMP){
 	}
 }
 
+int stringMatching(string palabra, string texto){
+
+	vector<int> tablaKMP(palabra.size(),0);
+	completarTablaKMP(palabra,tablaKMP);
+
+	int m = 0;
+	int i = 0;
+
+	while(m+i< texto.size()){
+		if (palabra[i] == texto[m+i]){
+			if (i==palabra.size()-1){						
+				return m;
+			}
+			i++;
+		}
+		else{
+			if (tablaKMP[i]>-1){
+				m = m+i- tablaKMP[i];
+				i = tablaKMP[i];
+			}
+			else{
+				m = m+1;
+				i = 0;
+			}
+		}
+
+	}	
+	return texto.size();
+}
+
 int main(){
-	string a("abcdabd");
-	vector<int> tablaKMP(a.size(),-8);
-
-	for (int i = 0; i < tablaKMP.size(); ++i){
-		cout << tablaKMP[0] << ",";
-	} cout << endl;
-
-	completarTablaKMP(a,tablaKMP);
-
-	for (int i = 0; i < tablaKMP.size(); ++i){
-		cout << tablaKMP[0] << ",";
-	} cout << endl;
+	
+	string texto; string palabra;
+	cin >> texto; cin >> palabra;		
+	int res = stringMatching(palabra,texto);
+	
+	if (res == texto.size()){
+		cout << "N" << endl;
+	}
+	else{
+		cout << "S" << endl;
+	}
 
 	return 0;
 }
-
