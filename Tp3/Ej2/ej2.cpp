@@ -12,7 +12,7 @@ int main(){
 		p.agregarPalabra(palabra, cant_caracteres);
 	}
 
-	cout << p.dameTMin();
+	cout << p.dameTMin() << endl;
 
 	return 0;
 }

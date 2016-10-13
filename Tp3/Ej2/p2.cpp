@@ -34,25 +34,34 @@ Complejidad:
 */ 
 void P2::agregarPalabra(string& palabra, int cant_caracteres){
 	
+	int pos;
 	nodo_trie* actual = &raiz;
 
 	for( int i = 0; i < palabra.size(); i++ ){
-		if( actual->hijos[ palabra[i]-'A' ] == NULL ){
-			actual->hijos[ palabra[i]-'A' ] = new nodo_trie;
-			inicializar( actual->hijos[ palabra[i]-'A' ] );
+
+		//Consigo la posición en el arreglo Hijos
+		if( palabra[i] <= 'Z')
+			pos = palabra[i] - 'A';
+		else
+			pos = 26 + palabra[i] - 'a';
+
+		//Si este caracter no estaba en el trie 
+		if( actual->hijos[pos] == NULL ){
+			actual->hijos[pos] = new nodo_trie;
+			inicializar( actual->hijos[pos] );
 		}
-		actual = actual->hijos[ palabra[i]-'A' ];
+
+		actual = actual->hijos[pos];
 		actual->cant_ocurrencias++;
-		cant_caracteres--;
+		cant_caracteres--;		
 
 		//Chequeo si es un prefijo
-		if(cant_caracteres == 0)
+		if( cant_caracteres == 0)
 			actual->esPrefijo = true;
 		
 		//Si es un prefijo, se aumento la cantidad de ocurrencias, actualizo minT
-		if( actual->esPrefijo ){
-			max(minT, actual->cant_ocurrencias);
-		}
+		if( actual->esPrefijo )
+			minT = max(minT, actual->cant_ocurrencias);
 	}
 }
 

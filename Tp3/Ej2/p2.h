@@ -2,7 +2,7 @@
 #define __P2_H_INCLUDED__
 #include <iostream>
 
-#define CANT_LETRAS 26*2
+#define CANT_LETRAS 52
 using namespace std;
 
 class P2{
