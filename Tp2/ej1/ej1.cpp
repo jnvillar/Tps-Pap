@@ -47,8 +47,10 @@ vector<int> bfs(Grafo graph, int nodoInical, int nodoFinal, vector< vector<int> 
 
 int flujoMaximo(Grafo graph, int s, int t, vector< vector<int> > capacidad){
 	
-	for(int i = 0; i<graph.cantNodos(); i++){	// transformo graph en su red residual
-		vector<int> vecinos = graph.nodosAdyacentes(i);
+	Grafo copia = graph;
+
+	for(int i = 0; i<copia.cantNodos(); i++){	// transformo graph en su red residual
+		vector<int> vecinos = copia.nodosAdyacentes(i);
 		for(int j = 0; j<vecinos.size(); j++){
 			graph.agregarArista(vecinos[j],i);
 		}
