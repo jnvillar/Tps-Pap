@@ -23,21 +23,18 @@ void P2::inicializar( nodo_trie* n){
 
 /*	
 Input:
-	palabra es un string a depositar en el Trie
-	cant_caracteres es la cantidad de caracteres restantes para marcar al nodo como prefijo de la palabra 
-
-Itero sobre todas las letras de "palabra", las voy colocando en el trie, 
-aumentando la cantida de ocurrencias si ya estaba.	
+	palabra es un string a depositar en el Trie.
+	long_prefijo es la cantidad de caracteres restantes para marcar al nodo como prefijo de la palabra.
 
 Complejidad:
-	O( |palabra| ) * O( inicializar ) = O( |palabra| * 27) = O(|palabra|)
+	O( |long_prefijo| ) * O( inicializar ) = O( |long_prefijo| * 27) = O(|long_prefijo|) = O(|palabra|)
 */ 
-void P2::agregarPalabra(string& palabra, int cant_caracteres){
+void P2::agregarPalabra(string& palabra, int long_prefijo){
 	
 	int pos;
 	nodo_trie* actual = &raiz;
 
-	for( int i = 0; i < palabra.size(); i++ ){
+	for( int i = 0; i < long_prefijo; i++ ){
 
 		//Consigo la posición en el arreglo Hijos
 		if( palabra[i] <= 'Z')
@@ -52,17 +49,17 @@ void P2::agregarPalabra(string& palabra, int cant_caracteres){
 		}
 
 		actual = actual->hijos[pos];
+		
+		//Aumento la cantidade veces que paso por este nodo
 		actual->cant_ocurrencias++;
-		cant_caracteres--;		
-
-		//Chequeo si es un prefijo
-		if( cant_caracteres == 0)
-			actual->esPrefijo = true;
 		
 		//Si es un prefijo, se aumento la cantidad de ocurrencias, actualizo minT
 		if( actual->esPrefijo )
 			minT = max(minT, actual->cant_ocurrencias);
 	}
+	//Actual apunta al nodo en el Trie que representa el último caracter del prefijo
+	actual->esPrefijo = true;
+	minT = max(minT, actual->cant_ocurrencias);
 }
 
 /*	Borro el espacio en memoria generado para el Trie	*/
