@@ -4,6 +4,9 @@ P2::P2(){
 	minT = 0;
 	inicializar(&raiz);
 }
+P2::~P2(){
+	borrarNodo(&raiz);
+}
 
 /*
 Input:

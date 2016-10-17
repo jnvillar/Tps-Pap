@@ -22,6 +22,7 @@ class P2{
 		void borrarNodo(nodo_trie *nodo);
 	public:
 		P2();
+		~P2();
 		void agregarPalabra(string&, int);
 		int dameTMin();
 };
