@@ -5,25 +5,31 @@
 using namespace std;
 
 void completarTablaKMP(string palabra, vector<int> &tablaKMP){
-	int pos = 2;				
+	int pos = 1;				
 	int cnd = 0;
-	tablaKMP[0] = -1;
-	tablaKMP[1] = 0;
+	tablaKMP[0] = 0;
+
 
 	while(pos<palabra.size()){
-		if(palabra[pos-1] == palabra[cnd]){
+		if(palabra[pos] == palabra[cnd]){
 			tablaKMP[pos] = cnd+1;
 			cnd++; pos++;
 		}
 		else if(cnd>0){
-			cnd = tablaKMP[cnd];
-			tablaKMP[pos] = 0;
+			cnd = tablaKMP[cnd-1];
 		}
 		else{
 			tablaKMP[pos] = 0;
 			pos++;
 		}	
 	}
+
+for (int i = 0; i < tablaKMP.size(); ++i)
+{
+	cout << tablaKMP[i] << " ";
+}
+cout << endl;
+
 }
 
 int stringMatching(string palabra, string texto){
@@ -34,24 +40,23 @@ int stringMatching(string palabra, string texto){
 	int m = 0;
 	int i = 0;
 
-	while(m+i< texto.size()){
-		if (palabra[i] == texto[m+i]){
+	while(m<texto.size()){
+		if (palabra[i] == texto[m]){
 			if (i==palabra.size()-1){						
 				return m;
 			}
 			i++;
+			m++;
 		}
 		else{
-			if (tablaKMP[i]>-1){
-				m = m+i- tablaKMP[i];
-				i = tablaKMP[i];
+			if (i != 0){
+				i = tablaKMP[i-1];
 			}
 			else{
 				m = m+1;
 				i = 0;
 			}
 		}
-
 	}	
 	return texto.size();
 }
