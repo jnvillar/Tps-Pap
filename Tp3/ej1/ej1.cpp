@@ -24,12 +24,6 @@ void completarTablaKMP(string palabra, vector<int> &tablaKMP){
 		}	
 	}
 
-for (int i = 0; i < tablaKMP.size(); ++i)
-{
-	cout << tablaKMP[i] << " ";
-}
-cout << endl;
-
 }
 
 int stringMatching(string palabra, string texto){

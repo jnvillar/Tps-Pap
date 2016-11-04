@@ -46,8 +46,8 @@ class SegmentTree{
 			if (i <= l && l < r && r <= j){
 				res = arbol[k];
 			} else if(r <= i || l >= j){
-				pair<int,int> infinito(-10,-10);
-				res = infinito;
+				pair<int,int> neutro(0,0);
+				res = neutro;
 			} else {
 				pair<int,int> resHijoIzq = funcRecursiva(2*k+1,l,(l+r)/2,i,j);
 				pair<int,int> resHijoDer = funcRecursiva(2*k+2,(l+r)/2,r,i,j);
