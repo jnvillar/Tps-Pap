@@ -19,7 +19,8 @@ class P2{
 		nodo_trie raiz;
 				
 		void inicializar(nodo_trie*);
-		void borrarNodo(nodo_trie *nodo);
+		void borrarNodo(nodo_trie*);
+		void borrarHijos(nodo_trie*);
 	public:
 		P2();
 		~P2();

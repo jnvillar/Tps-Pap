@@ -5,7 +5,7 @@ P2::P2(){
 	inicializar(&raiz);
 }
 P2::~P2(){
-	borrarNodo(&raiz);
+	borrarHijos(&raiz);
 }
 
 /*
@@ -67,10 +67,13 @@ void P2::agregarPalabra(string& palabra, int long_prefijo){
 
 /*	Borro el espacio en memoria generado para el Trie	*/
 void P2::borrarNodo(nodo_trie *nodo){
-	for(int i = 0; i < CANT_LETRAS; i++) 
-		if(nodo->hijos[i] != NULL) borrarNodo(nodo->hijos[i]);
-
+	borrarHijos(nodo);
 	delete nodo;
+}
+void P2::borrarHijos(nodo_trie *nodo){
+	for(int i = 0; i < CANT_LETRAS; i++){
+		if(nodo->hijos[i] != NULL) borrarNodo(nodo->hijos[i]);
+	}
 }
 
 int P2::dameTMin(){
