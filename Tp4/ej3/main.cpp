@@ -6,7 +6,7 @@
 #include <utility>      // std::pair
 
 // Para activar modo debug setear DEBUG_STATUS true
-#define DEBUG_STATUS true
+#define DEBUG_STATUS true  
 
 bool menorAngulo(Punto p1, Punto p2) {
     // p1 < p2 ?
@@ -115,17 +115,31 @@ int murallaMaxima(vector<Punto> historicos, vector<Punto> enemigos) {
             cout << endl;
         }
         vector<Punto> puntosOrdenados = ordenarPuntosSentidoAntihorario(centro, historicos);
-        vector<Punto> enemigosCentrados = centrar(centro, enemigos); 
-        if (DEBUG_STATUS) imprimirPuntos(puntosOrdenados);
+        vector<Punto> enemigosCentrados = centrar(centro, enemigos);
+        // como ya centramos al resto de los puntos con respecto a centro, ahora el centro es (0,0)
+        centro.setX(0);
+        centro.setY(0);
+
+        if (DEBUG_STATUS){
+            cout << "Puntos ordenados y centrados: \n";
+            imprimirPuntos(puntosOrdenados);
+            cout << "Puntos enemigos centrados: \n";
+            imprimirPuntos(enemigosCentrados);
+        }
+
         // itero sobre puntosOrdenados tomando en cada iteración a la recta (puntosOrdenados[i],puntosOrdenados[j]) como primer lado del polígono 
         for (int j = 0; j < h-1; j++) {
             // construyo un vector para guardar soluciones parciales. Utilizo los ultimos h-1-j elementos del mismo. No utilizo directamente un
             // vector de tamaño h-1-j para no tener que hacer tantas cuentas con los indices a la hora de acceder
             pair<int, Punto> init(2, centro);
             vector< pair<int, Punto> > subsoluciones(h-1, init);
+            for (int q = 0; q < j; q++)
+            {
+                subsoluciones[q].first = 0;
+            }
             // itero sobre puntosOrdenados a partir de la posición j+1 y en cada iteracion busco la mejor solución para el subconjunto de puntos incluido en
             // [puntosOrdenados[j+1] ; puntosOrdenados[k]], con la condicion de que dicha solucion incluya al punto puntosOrdenados[k]
-            for (int k = j+1; k < h-2; k++) {
+            for (int k = j+1; k < h-1; k++) {
                 // itero sobre las subsoluciones previemente calculadas, para poder calcular la que estoy buscando
                 for (int z = j; z < k; z++) {
                     // verifico que el poligono sea convexo
@@ -146,13 +160,16 @@ int murallaMaxima(vector<Punto> historicos, vector<Punto> enemigos) {
                         cout << endl;
                         cout << "Enemigos incluidos = " << t.puntosIncluidos(enemigosCentrados) << endl;
                     }
-                    if (t.puntosIncluidos(enemigos) > 0) {
+                    if (t.puntosIncluidos(enemigosCentrados) > 0) {
                         // si hay enemigos no es solución y salto a la siguiente iteración
                         continue;
                     } else {
                         // si no hay enemigos, calculo la cantidad de puntos historicos incluidos en el triangulo. Resto 1 porque puntosOrdenados[k] ya
                         // esta sumado en la subsolucion anterior  
-                        int nuevosPuntos = t.puntosIncluidos(puntosOrdenados);
+                        int nuevosPuntos = t.puntosIncluidos(puntosOrdenados) - 1;
+                        if (DEBUG_STATUS){
+                            cout << "Nuevos puntos que se incluyen : " << nuevosPuntos << endl;
+                        }
                         // si la nueva solucion es mayor entonces la guardamos 
                         if (subsoluciones[z].first + nuevosPuntos > subsoluciones[k].first) {
                             subsoluciones[k].first = subsoluciones[z].first + nuevosPuntos;
@@ -184,8 +201,22 @@ int murallaMaxima(vector<Punto> historicos, vector<Punto> enemigos) {
                 if (subsoluciones[i].first > maximo)
                     maximo = subsoluciones[i].first;
             }
+            if (DEBUG_STATUS){
+                cout << "Subsoluciones: \n";
+                cout << "[";
+                for (int g = 0; g < subsoluciones.size(); g++)
+                {
+                    cout << "{" << subsoluciones[g].first << ",";
+                    subsoluciones[g].second.imprimir();
+                    cout << "}";
+                    if (g != subsoluciones.size()-1)
+                        cout << ";";
+                }
+                cout << "]\n";
+                cout << "Maximo hasta el momento: " << maximo << endl;
+            }
         }
-
+        if (DEBUG_STATUS) cout << "\n";
     }
     return maximo;
 }
@@ -251,5 +282,33 @@ int main()
     pair < vector<Punto>, vector<Punto> > parametros = parsear();
     int res = murallaMaxima(parametros.first, parametros.second);
     cout << "Resultado = " << res << endl;
+
+    // Punto p1(-6,0);
+    // Punto p2(3,0);
+    // Segmento s1(p1, p2, 0, 1);
+
+    // Punto p3(0,4);
+    // Punto p4(0,-2);
+    // Segmento s2(p3, p4, 0, 1);
+
+
+    // bool a = s1.hayInterseccion(s2);
+    // bool b = s2.hayInterseccion(s1);
+    // bool c = s1.hayInterseccion(s1);
+    // bool d = s2.hayInterseccion(s2);
+
+    // cout << "s1 con s2: " << a << endl;
+    // cout << "s2 con s1: " << b << endl;
+    // cout << "s1 con s1: " << c << endl;
+    // cout << "s2 con s2: " << d << endl;
+
+
+
+
+
+
+
+
+
 
 }
