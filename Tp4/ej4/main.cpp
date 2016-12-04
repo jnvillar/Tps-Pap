@@ -24,6 +24,22 @@ bool hay_ciclo_par(vector<int>& cc){
 	return res;
 }
 
+int gcd(int a, int b){
+	int res = 0;
+
+	if( a == 0 ){
+		if( b!=0)
+			res = gcd(b,a);
+	} else{
+		while ( b != 0 ){
+			res = a;
+			a = b;
+			b = res%b; 
+		}
+		res = a;
+	}
+	return res;
+}
 
 
 int main(){
@@ -72,18 +88,12 @@ int main(){
 		}
 	}
 
-	vector<int> mcds;
+	long int exp = 0;
 	for (int i = 0; i < sinRepetidos.size(); ++i){
 		for (int j = i+1; j < sinRepetidos.size(); ++j){
-			mcds.push_back(std::__gcd(sinRepetidos[i],sinRepetidos[j])*cantidadSinRepetidos[i]*cantidadSinRepetidos[j]);
+			exp += gcd(sinRepetidos[i],sinRepetidos[j])*cantidadSinRepetidos[i]*cantidadSinRepetidos[j];
 		}
 	}
-
-	int exp = 0;
-	for (int i = 0; i < mcds.size(); ++i){
-		exp += mcds[i];
-	}
-	cout << exp << endl;
 
 	//print_comp_conexas(comp_conexas);
 	int res = 0;
@@ -93,7 +103,7 @@ int main(){
 		//exponente /=2;
 		exponente = exponente%1000000006; //Arbitrariamente piden modulo 1.000.000.007 
 		res = (1<<exponente)%1000000007;
-		cout << "exponente " << exponente << endl;
+		//cout << "exponente " << exponente << endl;
 	}
 	cout << res << endl;
 	return 0;
