@@ -104,48 +104,6 @@ private:
     double coordY;
 };
 
-Punto min(Punto p1, Punto p2){
-    if(p1<p2){
-        return p1;
-    }
-    return p2;
-}
-
-Punto max(Punto p1, Punto p2){
-    if(p1<p2){
-        return p2;
-    }
-    return p1;
-}
-
-// class Recta{
-// public:
-
-//     Recta(Punto direc, Punto p){
-//         direccion = direc;
-//         punto = p;
-//     }
-
-//     Punto getDireccion() const{
-//         return direccion;
-//     }
-
-//     Punto getPunto() const{
-//         return punto;
-//     }
-
-//     bool hayInterseccion(Recta r) {
-//         bool res = true;
-//         if (direccion.prodCruz(r.getDireccion()) == 0)
-//             res = false;
-//         return res;
-//     }
-
-// private:
-//     Punto direccion;
-//     Punto punto;
-// };
-
 class Segmento{
 public:
 
