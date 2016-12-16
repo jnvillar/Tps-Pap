@@ -1,5 +1,5 @@
 #include <iostream>
-#include "parser.cpp"
+#include "parser.h"
 #include <vector>
 #include <map>
 #include <set>

@@ -1,4 +1,4 @@
-#include "punto.cpp"
+#include "punto.h"
 #include <vector>
 #include <set>
 #include <map>
@@ -25,7 +25,11 @@ void parser(set<Recta>& conjRectas,  map<Punto,set<Recta> >& puntoRectas, int& l
         // Guardo punto 1
         cin >> x; cin >> y;
         Punto p1(x,y);
-        if(puntoInicialNoDefinido) puntoInicial = p1;
+        if(puntoInicialNoDefinido){
+            puntoInicial = p1;
+            puntoInicialNoDefinido = false;
+        } 
+
         // Guardo punto 2
         cin >> x; cin >> y;
         Punto p2(x,y);
